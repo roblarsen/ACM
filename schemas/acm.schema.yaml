@@ -1,0 +1,66 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://raw.githubusercontent.com/roblarsen/ACM/main/schemas/acm.schema.yaml"
+title: "Assumptions & Constraints Manifest (ACM) Metadata Schema"
+description: "Specification schema for the YAML frontmatter of an Assumptions & Constraints Manifest (v1.0)."
+type: object
+required:
+  - acm_version
+  - change_type
+  - risk_level
+  - contracts
+properties:
+  acm_version:
+    type: string
+    enum:
+      - "1.0"
+    description: "Specification version of the ACM document."
+  change_type:
+    type: string
+    enum:
+      - feature
+      - refactor
+      - bugfix
+      - hotfix
+      - infra
+    description: "Classification of the software modification."
+  risk_level:
+    type: string
+    enum:
+      - low
+      - medium
+      - high
+      - critical
+    description: "Operational risk assessment based on boundary stability."
+  contracts:
+    type: object
+    description: "Core operational and architectural runtime contract invariants."
+    required:
+      - idempotent
+      - concurrency_safe
+      - horizontal_scale_ready
+      - strict_ordering_required
+      - data_loss_safe
+    properties:
+      idempotent:
+        type: boolean
+        description: "True if repeated calls produce identical side-effects without state corruption."
+      concurrency_safe:
+        type: boolean
+        description: "True if safe against race conditions under concurrent load."
+      horizontal_scale_ready:
+        type: boolean
+        description: "True if safe across multi-instance stateless cluster deployments."
+      strict_ordering_required:
+        type: boolean
+        description: "True if execution depends on guaranteed sequential message arrival."
+      data_loss_safe:
+        type: boolean
+        description: "True if failures guarantee zero silent data dropping or state loss."
+    additionalProperties: false
+  tags:
+    type: array
+    description: "Optional architectural or subsystem domain classification tags."
+    items:
+      type: string
+    uniqueItems: true
+additionalProperties: false
