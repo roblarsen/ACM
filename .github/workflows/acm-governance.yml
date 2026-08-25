@@ -1,0 +1,109 @@
+name: "ACM Governance Gate"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-manifest:
+    name: "Validate Assumptions & Constraints"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Extract PR Body to Environment File
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Write PR body safely to a temporary file for the validator
+          cat << 'EOF' > /tmp/pr_body.md
+          ${{ env.PR_BODY }}
+          EOF
+
+      - name: Execute acm-cli Validator
+        id: acm_validator
+        continue-on-error: true
+        run: |
+          # Install CLI or run directly via npx / local workspace build
+          npx @open-standards/acm-cli validate --file /tmp/pr_body.md > /tmp/acm_output.log 2>&1
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          
+          # Read log into multi-line output variable
+          {
+            echo "log<<EOF"
+            cat /tmp/acm_output.log
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Format PR Governance Comment
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const exitCode = parseInt('${{ steps.acm_validator.outputs.exit_code }}', 10);
+            const rawLog = `${{ steps.acm_validator.outputs.log }}`;
+            const isValid = exitCode === 0;
+
+            const marker = '<!-- ACM-GOVERNANCE-AUDIT -->';
+            const icon = isValid ? '✅' : '❌';
+            const statusText = isValid ? 'ACM Specification Passed' : 'ACM Validation Failed';
+
+            const commentBody = `${marker}
+            ## ${icon} Engineering Governance: ${statusText}
+
+            ${isValid ? 'The declared boundaries and runtime contracts adhere to **SPEC v1.0**.' : 'This pull request cannot be merged until all implicit boundaries and mandatory ACM sections are completed.'}
+
+            <details ${isValid ? '' : 'open'}>
+            <summary><b>View Auditor Log Output</b></summary>
+
+            \`\`\`text
+            ${rawLog.trim()}
+            \`\`\`
+            </details>
+
+            ---
+            *Automated enforcement via [@open-standards/acm-cli](https://github.com/open-standards/assumptions-manifest).*`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(c => c.body.includes(marker));
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Gate Enforcement
+        if: steps.acm_validator.outputs.exit_code != 0
+        run: |
+          echo "::error title=ACM Validation Failed::The PR description is missing a valid Assumptions & Constraints Manifest block or has schema errors."
+          exit 1
