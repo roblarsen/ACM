@@ -2,18 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/roblarsen/ACM/main/schemas/acm.schema.json",
   "title": "Assumptions & Constraints Manifest (ACM) Metadata Schema",
-  "description": "JSON Schema specification for the YAML frontmatter of an Assumptions & Constraints Manifest (v1.0).",
+  "description": "Specification schema for the YAML frontmatter of an Assumptions & Constraints Manifest (v1.1).",
   "type": "object",
   "required": [
     "acm_version",
     "change_type",
     "risk_level",
-    "contracts"
+    "contracts",
+    "distributed_primitives"
   ],
   "properties": {
     "acm_version": {
       "type": "string",
-      "enum": ["1.0"],
+      "enum": ["1.1"],
       "description": "Specification version of the ACM document."
     },
     "change_type": {
@@ -24,38 +25,96 @@
     "risk_level": {
       "type": "string",
       "enum": ["low", "medium", "high", "critical"],
-      "description": "Author or agent operational risk assessment based on boundary stability."
+      "description": "Operational risk assessment based on boundary stability."
     },
     "contracts": {
       "type": "object",
-      "description": "Core operational and architectural runtime contract invariants.",
+      "description": "Core operational and architectural runtime contract declarations.",
       "required": [
-        "idempotent",
-        "concurrency_safe",
-        "horizontal_scale_ready",
-        "strict_ordering_required",
-        "data_loss_safe"
+        "idempotency",
+        "concurrency_safety",
+        "horizontal_scalability",
+        "strict_ordering",
+        "data_loss_safety"
       ],
       "properties": {
-        "idempotent": {
-          "type": "boolean",
-          "description": "True if repeated executions with identical inputs produce identical side-effects without corruption."
+        "idempotency": {
+          "$ref": "#/$defs/contractProperty",
+          "description": "Execution repeatability guarantees without duplicate side-effects."
         },
-        "concurrency_safe": {
-          "type": "boolean",
-          "description": "True if execution is thread-safe and protected against race conditions, interleaving, and phantom reads under high concurrent load."
+        "concurrency_safety": {
+          "$ref": "#/$defs/contractProperty",
+          "description": "Protection against race conditions and interleaving under concurrent execution."
         },
-        "horizontal_scale_ready": {
-          "type": "boolean",
-          "description": "True if execution does not rely on local in-memory state or single-node process locality and can run safely across multi-replica clusters."
+        "horizontal_scalability": {
+          "$ref": "#/$defs/contractProperty",
+          "description": "Safety across multi-replica, stateless node clusters without local memory reliance."
         },
-        "strict_ordering_required": {
-          "type": "boolean",
-          "description": "True if correct execution depends strictly on FIFO / monotonic ordering of incoming event streams or requests."
+        "strict_ordering": {
+          "$ref": "#/$defs/contractProperty",
+          "description": "Dependency on sequential FIFO message/event arrival."
         },
-        "data_loss_safe": {
-          "type": "boolean",
-          "description": "True if unhandled exceptions, power drops, or network blips guarantee zero silent message drops or unrecoverable state losses."
+        "data_loss_safety": {
+          "$ref": "#/$defs/contractProperty",
+          "description": "Protection against silent message dropping or uncommitted writes during failure."
+        }
+      },
+      "additionalProperties": false
+    },
+    "distributed_primitives": {
+      "type": "object",
+      "description": "Distributed systems execution and degradation semantics.",
+      "required": [
+        "consistency_model",
+        "delivery_semantics",
+        "degradation_mode",
+        "backpressure_strategy"
+      ],
+      "properties": {
+        "consistency_model": {
+          "type": "string",
+          "enum": [
+            "eventual",
+            "read_your_writes",
+            "monotonic_reads",
+            "linearizable",
+            "not_applicable",
+            "unknown"
+          ],
+          "description": "Client read consistency model."
+        },
+        "delivery_semantics": {
+          "type": "string",
+          "enum": [
+            "at_most_once",
+            "at_least_once",
+            "exactly_once_claimed",
+            "not_applicable",
+            "unknown"
+          ],
+          "description": "Message/event bus transport delivery guarantee."
+        },
+        "degradation_mode": {
+          "type": "string",
+          "enum": [
+            "fail_closed",
+            "fail_open",
+            "stale_reads",
+            "partial_unavailable",
+            "unknown"
+          ],
+          "description": "System posture during downstream dependency outages."
+        },
+        "backpressure_strategy": {
+          "type": "string",
+          "enum": [
+            "fail_fast",
+            "queue_bounded",
+            "shed_load",
+            "unbounded_buffer_risk",
+            "not_applicable"
+          ],
+          "description": "Behavior under excessive incoming load."
         }
       },
       "additionalProperties": false
@@ -69,5 +128,41 @@
       "uniqueItems": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "contractProperty": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "guaranteed",
+            "conditional",
+            "unsupported",
+            "not_applicable",
+            "unknown"
+          ],
+          "description": "Operational guarantee level."
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Concrete reference to code line, lock mechanism, or test proving the contract (required if guaranteed)."
+        },
+        "conditions": {
+          "type": "string",
+          "description": "Prerequisites under which this contract holds (required if conditional)."
+        },
+        "failure_mode": {
+          "type": "string",
+          "description": "Specific failure or corruption mode when execution violates this invariant (required if unsupported)."
+        },
+        "scope": {
+          "type": "string",
+          "description": "Specific submodules, endpoints, or file paths where this contract applies."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }

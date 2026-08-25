@@ -9,8 +9,8 @@ const program = new Command();
 
 program
   .name('acm-cli')
-  .description('Validator and governance auditor for Assumptions & Constraints Manifest (ACM v1.0)')
-  .version('1.0.0');
+  .description('Validator and governance auditor for Assumptions & Constraints Manifest (ACM v1.1)')
+  .version('1.1.0');
 
 program
   .command('validate')
@@ -33,36 +33,46 @@ program
       process.exit(1);
     }
 
-    const acmBlock = extractACMBlock(rawContent);
+    const { content: acmBlock, error: extractionError } = extractACMBlock(rawContent);
 
-    if (!acmBlock) {
-      console.error(chalk.red('✖ Validation Failed: No ACM block found (missing <!-- ACM-START --> or frontmatter).'));
+    if (extractionError || !acmBlock) {
+      console.error(chalk.red(`✖ Delimiter Error: ${extractionError || 'No valid ACM block found.'}`));
       process.exit(1);
     }
 
     const result = parseAndValidateACM(acmBlock);
 
     if (!result.isValid) {
-      console.error(chalk.red('\n✖ ACM Validation Failed with errors:\n'));
+      console.error(chalk.red('\n✖ ACM Validation Failed (SPEC v1.1 Violation):\n'));
       result.errors.forEach((err) => console.error(chalk.red(`  • ${err}`)));
       if (result.warnings.length > 0) {
-        console.log(chalk.yellow('\nWarnings:'));
+        console.log(chalk.yellow('\nOperational Warnings:'));
         result.warnings.forEach((warn) => console.log(chalk.yellow(`  ⚠ ${warn}`)));
       }
       process.exit(1);
     }
 
-    console.log(chalk.green('✔ ACM Validation Passed: Manifest structure and contracts adhere to SPEC v1.0.'));
+    console.log(chalk.green('✔ ACM Validation Passed: Manifest structure and contracts adhere to SPEC v1.1.'));
 
     if (result.frontmatter) {
       console.log(chalk.cyan('\nManifest Summary:'));
       console.log(`  • Version:     ${result.frontmatter.acm_version}`);
       console.log(`  • Change Type: ${result.frontmatter.change_type}`);
       console.log(`  • Risk Level:  ${result.frontmatter.risk_level.toUpperCase()}`);
-      console.log('  • Contracts:');
-      for (const [key, val] of Object.entries(result.frontmatter.contracts)) {
-        const color = val ? chalk.green : chalk.yellow;
-        console.log(`      - ${key}: ${color(val)}`);
+      
+      console.log(chalk.cyan('\nContracts Status:'));
+      for (const [key, prop] of Object.entries(result.frontmatter.contracts)) {
+        let statusColor = chalk.gray;
+        if (prop.status === 'guaranteed') statusColor = chalk.green;
+        if (prop.status === 'conditional') statusColor = chalk.cyan;
+        if (prop.status === 'unsupported') statusColor = chalk.red;
+        if (prop.status === 'unknown') statusColor = chalk.yellow;
+        console.log(`  • ${key.padEnd(24)}: ${statusColor(prop.status.toUpperCase())}`);
+      }
+
+      console.log(chalk.cyan('\nDistributed Primitives:'));
+      for (const [key, val] of Object.entries(result.frontmatter.distributed_primitives)) {
+        console.log(`  • ${key.padEnd(24)}: ${chalk.magenta(val)}`);
       }
     }
 
