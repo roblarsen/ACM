@@ -1,18 +1,38 @@
 import YAML from 'yaml';
 import { ACMFrontmatterSchema, ACMValidationResult, MANDATORY_SECTIONS, ACMFrontmatter } from './types.js';
 
-const ACM_START_DELIMITER_REGEX = /<!--\s*ACM-START\s*-->|<acm>/gi;
-const ACM_END_DELIMITER_REGEX = /<!--\s*ACM-END\s*-->|<\/acm>/gi;
-const ACM_BLOCK_REGEX = /(?:<!--\s*ACM-START\s*-->|<acm>)([\s\S]*?)(?:<!--\s*ACM-END\s*-->|<\/acm>)/i;
 const FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/;
+const ACM_DELIMITER_REGEX = /<!--\s*ACM-(?:START|END)\s*-->|<\/?acm>/gi;
+
+function findDelimitersOutsideFences(input: string): RegExpMatchArray[] {
+  const matches: RegExpMatchArray[] = [];
+  let inFence = false;
+  let offset = 0;
+
+  for (const line of input.split(/\r?\n/)) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence;
+    }
+    if (!inFence) {
+      for (const match of line.matchAll(ACM_DELIMITER_REGEX)) {
+        Object.defineProperty(match, 'index', { value: match.index! + offset });
+        matches.push(match);
+      }
+    }
+    const separatorLength = input[offset + line.length] === '\r' ? 2 : input[offset + line.length] === '\n' ? 1 : 0;
+    offset += line.length + separatorLength;
+  }
+  return matches;
+}
 
 /**
  * Extracts raw ACM text from PR descriptions or markdown documents.
  * Enforces singular delimiter grammar to prevent bypasses.
  */
 export function extractACMBlock(input: string): { content: string | null; error?: string } {
-  const startMatches = input.match(ACM_START_DELIMITER_REGEX) || [];
-  const endMatches = input.match(ACM_END_DELIMITER_REGEX) || [];
+  const delimiters = findDelimitersOutsideFences(input);
+  const startMatches = delimiters.filter((match) => /START|<acm>/i.test(match[0]));
+  const endMatches = delimiters.filter((match) => /END|<\/acm>/i.test(match[0]));
 
   if (startMatches.length > 1 || endMatches.length > 1) {
     return {
@@ -28,9 +48,16 @@ export function extractACMBlock(input: string): { content: string | null; error?
     };
   }
 
-  const match = input.match(ACM_BLOCK_REGEX);
-  if (match && match[1]) {
-    return { content: match[1].trim() };
+  if (startMatches.length === 1 && endMatches.length === 1) {
+    const start = startMatches[0].index! + startMatches[0][0].length;
+    const end = endMatches[0].index!;
+    if (start < end) {
+      const content = input.slice(start, end).trim();
+      if (!content || !content.replace(/<!--[\s\S]*?-->/g, '').trim().startsWith('---')) {
+        return { content: null, error: 'Invalid ACM block: Block must contain YAML frontmatter.' };
+      }
+      return { content };
+    }
   }
 
   // Fallback: If document is a standalone .acm.md file starting directly with frontmatter

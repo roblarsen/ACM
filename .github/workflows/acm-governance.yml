@@ -37,7 +37,7 @@ jobs:
         continue-on-error: true
         run: |
           # Install CLI or run directly via npx / local workspace build
-          npx @open-standards/acm-cli validate --file /tmp/pr_body.md > /tmp/acm_output.log 2>&1
+          npx acm-cli validate --file /tmp/pr_body.md > /tmp/acm_output.log 2>&1
           EXIT_CODE=$?
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
           
@@ -76,7 +76,7 @@ jobs:
             </details>
 
             ---
-            *Automated enforcement via [@open-standards/acm-cli](https://github.com/open-standards/assumptions-manifest).*`;
+            *Automated enforcement via [acm-cli](https://github.com/roblarsen/ACM/tree/main/tooling/acm-cli).*`;
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
