@@ -175,10 +175,10 @@ jobs:
   validate-acm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - name: Validate PR Manifest
         run: npx @open-standards/acm-cli validate --pr-body "${{ github.event.pull_request.body }}"
 ```
