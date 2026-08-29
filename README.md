@@ -3,7 +3,7 @@
 > **A formal open-source engineering standard for boundary verification, typed operational contracts, and AI-governed software delivery.**
 
 [![Specification](https://img.shields.io/badge/spec-v1.1.0--draft-blue.svg)](./spec.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.txt)
 [![CI Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 
 ---
