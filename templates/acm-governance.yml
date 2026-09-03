@@ -27,7 +27,6 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Write PR body safely to a temporary file for the validator
           cat << 'EOF' > /tmp/pr_body.md
           ${{ env.PR_BODY }}
           EOF
@@ -36,12 +35,10 @@ jobs:
         id: acm_validator
         continue-on-error: true
         run: |
-          # Install CLI or run directly via npx / local workspace build
           npx acm-cli validate --file /tmp/pr_body.md > /tmp/acm_output.log 2>&1
           EXIT_CODE=$?
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
 
-          # Read log into multi-line output variable
           {
             echo "log<<EOF"
             cat /tmp/acm_output.log

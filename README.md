@@ -118,6 +118,7 @@ tags:
 │   └── acm.schema.yaml        # OpenAPI / YAML Schema definition
 ├── templates/
 │   ├── PULL_REQUEST_TEMPLATE.md # Drop-in PR template with signed sign-off checklist
+│   ├── acm-governance.yml     # Drop-in GitHub Actions workflow for PR gating
 │   └── CURSORRULES.md         # Drop-in rules for Cursor & Copilot agents
 ├── tooling/
 │   └── acm-cli/               # TypeScript CLI linter and parser (v1.1)
@@ -149,20 +150,29 @@ Copy `templates/PULL_REQUEST_TEMPLATE.md` into your `.github/` directory:
 cp templates/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE.md
 ```
 
-### 3. Run the CLI Validator
+### 3. Install Workflow-Level Governance Gating
+
+Copy the drop-in workflow into your repository so pull requests are automatically audited:
+
+```bash
+mkdir -p .github/workflows
+cp templates/acm-governance.yml .github/workflows/acm-governance.yml
+```
+
+### 4. Run the CLI Validator
 
 Install and run `acm-cli` in your pre-commit hooks or local environment:
 
 ```bash
 # Validate an ACM file or PR body
-npx @open-standards/acm-cli validate --file .acm.md
+npx acm-cli validate --file .acm.md
 ```
 
 ---
 
 ## Governance & CI/CD Gating
 
-Add `.github/workflows/acm-governance.yml` to automatically gate pull requests based on boundary completeness, evidence verification, and risk profile:
+Copy `templates/acm-governance.yml` into `.github/workflows/acm-governance.yml` to automatically gate pull requests based on boundary completeness, evidence verification, and risk profile:
 
 ```yaml
 name: "ACM Governance Gate"
@@ -180,7 +190,7 @@ jobs:
         with:
           node-version: 22
       - name: Validate PR Manifest
-        run: npx @open-standards/acm-cli validate --pr-body "${{ github.event.pull_request.body }}"
+        run: npx acm-cli validate --pr-body "${{ github.event.pull_request.body }}"
 ```
 
 ---
