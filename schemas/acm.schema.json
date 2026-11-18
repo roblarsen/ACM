@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/roblarsen/ACM/main/schemas/acm.schema.json",
   "title": "Assumptions & Constraints Manifest (ACM) Metadata Schema",
-  "description": "Specification schema for the YAML frontmatter of an Assumptions & Constraints Manifest (v1.1).",
+  "description": "Specification schema for the YAML frontmatter of an Assumptions & Constraints Manifest (v1.2).",
   "type": "object",
   "required": [
     "acm_version",
@@ -14,7 +14,7 @@
   "properties": {
     "acm_version": {
       "type": "string",
-      "enum": ["1.1"],
+      "enum": ["1.2"],
       "description": "Specification version of the ACM document."
     },
     "change_type": {

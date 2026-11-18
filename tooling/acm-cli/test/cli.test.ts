@@ -41,7 +41,7 @@ describe('acm-cli validate process', () => {
   });
 
   it('returns one and reports validation errors on stderr', () => {
-    const invalid = wrapManifest(validManifest.replace('acm_version: "1.1"', 'acm_version: "1.0"'));
+    const invalid = wrapManifest(validManifest.replace('acm_version: "1.2"', 'acm_version: "1.0"'));
     const result = runCli('--pr-body', invalid);
     assert.equal(result.status, 1);
     assert.match(result.stderr, /ACM Validation Failed/);

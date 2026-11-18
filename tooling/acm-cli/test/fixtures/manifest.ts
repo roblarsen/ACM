@@ -1,5 +1,5 @@
 export const validManifest = `---
-acm_version: "1.1"
+acm_version: "1.2"
 change_type: feature
 risk_level: high
 contracts:

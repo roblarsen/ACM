@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const CURSOR_MDC_HEADER = `---
-description: Enforce Assumptions & Constraints Manifest (ACM v1.1) boundary contracts on code changes
+description: Enforce Assumptions & Constraints Manifest (ACM v1.2) boundary contracts on code changes
 globs: "**/*"
 alwaysApply: true
 ---

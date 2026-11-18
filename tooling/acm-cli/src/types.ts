@@ -52,7 +52,7 @@ export const BackpressureStrategyEnum = z.enum([
 ]);
 
 export const ACMFrontmatterSchema = z.object({
-  acm_version: z.literal('1.1'),
+  acm_version: z.literal('1.2'),
   change_type: z.enum(['feature', 'refactor', 'bugfix', 'hotfix', 'infra']),
   risk_level: z.enum(['low', 'medium', 'high', 'critical']),
   contracts: z.object({

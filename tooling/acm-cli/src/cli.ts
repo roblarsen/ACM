@@ -9,7 +9,7 @@ const program = new Command();
 
 program
   .name('acm-cli')
-  .description('Validator and governance auditor for Assumptions & Constraints Manifest (ACM v1.1)')
+  .description('Validator and governance auditor for Assumptions & Constraints Manifest (ACM v1.2)')
   .version('1.2.0');
 
 program
@@ -62,7 +62,7 @@ program
     const result = parseAndValidateACM(acmBlock);
 
     if (!result.isValid) {
-      console.error(chalk.red(`\n✖ ACM Validation Failed in ${sourceLabel} (SPEC v1.1 Violation):\n`));
+      console.error(chalk.red(`\n✖ ACM Validation Failed in ${sourceLabel} (SPEC v1.2 Violation):\n`));
       result.errors.forEach((err) => console.error(chalk.red(`  • ${err}`)));
       if (result.warnings.length > 0) {
         console.log(chalk.yellow('\nOperational Warnings:'));
@@ -71,7 +71,7 @@ program
       process.exit(1);
     }
 
-    console.log(chalk.green(`✔ ACM Validation Passed (${sourceLabel}): Manifest structure and contracts adhere to SPEC v1.1.`));
+    console.log(chalk.green(`✔ ACM Validation Passed (${sourceLabel}): Manifest structure and contracts adhere to SPEC v1.2.`));
 
     if (result.frontmatter) {
       console.log(chalk.cyan('\nManifest Summary:'));

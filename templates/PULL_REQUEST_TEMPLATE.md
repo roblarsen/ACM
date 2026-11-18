@@ -9,7 +9,7 @@
 
 <!-- ACM-START -->
 <!--
-  ASSUMPTIONS & CONSTRAINTS MANIFEST (ACM) v1.1
+  ASSUMPTIONS & CONSTRAINTS MANIFEST (ACM) v1.2
   Instructions:
   - Fill out the typed frontmatter contracts and distributed primitives.
   - Contract status options: guaranteed | conditional | unsupported | not_applicable | unknown
@@ -19,7 +19,7 @@
   - Complete all mandatory narrative sections (1-4) with concrete details.
 -->
 ---
-acm_version: "1.1"
+acm_version: "1.2"
 change_type: "feature" # Options: feature | refactor | bugfix | hotfix | infra
 risk_level: "medium"   # Options: low | medium | high | critical
 contracts:

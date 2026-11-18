@@ -59,7 +59,7 @@ jobs:
             const commentBody = `${marker}
             ## ${icon} Engineering Governance: ${statusText}
 
-            ${isValid ? 'The declared boundaries and runtime contracts adhere to **SPEC v1.1**.' : 'This pull request cannot be merged until all implicit boundaries, proof obligations, and mandatory ACM sections are completed.'}
+            ${isValid ? 'The declared boundaries and runtime contracts adhere to **SPEC v1.2**.' : 'This pull request cannot be merged until all implicit boundaries, proof obligations, and mandatory ACM sections are completed.'}
 
             <details ${isValid ? '' : 'open'}>
             <summary><b>View Auditor Log Output</b></summary>
