@@ -42,11 +42,14 @@ jobs:
       - name: Format PR Governance Comment
         uses: actions/github-script@v7
         if: always()
+        env:
+          ACM_EXIT_CODE: ${{ steps.acm_validator.outputs.exit_code }}
+          ACM_VALIDATOR_LOG: ${{ steps.acm_validator.outputs.log }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const exitCode = parseInt('${{ steps.acm_validator.outputs.exit_code }}', 10);
-            const rawLog = `${{ steps.acm_validator.outputs.log }}`;
+            const exitCode = Number.parseInt(process.env.ACM_EXIT_CODE ?? '', 10);
+            const rawLog = process.env.ACM_VALIDATOR_LOG ?? '';
             const isValid = exitCode === 0;
 
             const marker = '<!-- ACM-GOVERNANCE-AUDIT -->';
@@ -61,9 +64,9 @@ jobs:
             <details ${isValid ? '' : 'open'}>
             <summary><b>View Auditor Log Output</b></summary>
 
-            \`\`\`text
+            \\`\\`\\`text
             ${rawLog.trim()}
-            \`\`\`
+            \\`\\`\\`
             </details>
 
             ---
