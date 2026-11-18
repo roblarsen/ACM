@@ -15,33 +15,24 @@ jobs:
 
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
-
-      - name: Extract PR Body to Environment File
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
-        run: |
-          # Write PR body safely to a temporary file for the validator
-          cat << 'EOF' > /tmp/pr_body.md
-          ${{ env.PR_BODY }}
-          EOF
+          cache: 'npm'
+          cache-dependency-path: 'tooling/acm-cli/package-lock.json'
 
       - name: Execute acm-cli Validator
         id: acm_validator
         continue-on-error: true
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Install CLI or run directly via npx / local workspace build
-          npx acm-cli validate --file /tmp/pr_body.md > /tmp/acm_output.log 2>&1
+          npx acm-cli validate --pr-body "$PR_BODY" --fallback-file .acm.md > /tmp/acm_output.log 2>&1
           EXIT_CODE=$?
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
-
-          # Read log into multi-line output variable
           {
             echo "log<<EOF"
             cat /tmp/acm_output.log
@@ -51,11 +42,14 @@ jobs:
       - name: Format PR Governance Comment
         uses: actions/github-script@v7
         if: always()
+        env:
+          ACM_EXIT_CODE: ${{ steps.acm_validator.outputs.exit_code }}
+          ACM_VALIDATOR_LOG: ${{ steps.acm_validator.outputs.log }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const exitCode = parseInt('${{ steps.acm_validator.outputs.exit_code }}', 10);
-            const rawLog = `${{ steps.acm_validator.outputs.log }}`;
+            const exitCode = Number.parseInt(process.env.ACM_EXIT_CODE ?? '', 10);
+            const rawLog = process.env.ACM_VALIDATOR_LOG ?? '';
             const isValid = exitCode === 0;
 
             const marker = '<!-- ACM-GOVERNANCE-AUDIT -->';
@@ -65,7 +59,7 @@ jobs:
             const commentBody = `${marker}
             ## ${icon} Engineering Governance: ${statusText}
 
-            ${isValid ? 'The declared boundaries and runtime contracts adhere to **SPEC v1.0**.' : 'This pull request cannot be merged until all implicit boundaries and mandatory ACM sections are completed.'}
+            ${isValid ? 'The declared boundaries and runtime contracts adhere to **SPEC v1.1**.' : 'This pull request cannot be merged until all implicit boundaries, proof obligations, and mandatory ACM sections are completed.'}
 
             <details ${isValid ? '' : 'open'}>
             <summary><b>View Auditor Log Output</b></summary>
@@ -76,7 +70,7 @@ jobs:
             </details>
 
             ---
-            *Automated enforcement via [acm-cli](https://github.com/roblarsen/ACM/tree/main/tooling/acm-cli).*`;
+            *Automated enforcement via [acm-cli](https://github.com/roblarsen/ACM).*`;
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,

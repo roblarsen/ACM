@@ -1,0 +1,25 @@
+{
+  "name": "acm",
+  "version": "1.0.0",
+  "description": "> **A formal open-source engineering standard for boundary verification, typed operational contracts, and AI-governed software delivery.**",
+  "homepage": "https://github.com/roblarsen/ACM#readme",
+  "bugs": {
+    "url": "https://github.com/roblarsen/ACM/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roblarsen/ACM.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "sync:templates": "node scripts/sync-templates.mjs",
+    "check:templates": "node scripts/sync-templates.mjs --check"
+  }
+}
