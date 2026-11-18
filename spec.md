@@ -1,6 +1,6 @@
 # Assumptions & Constraints Manifest (ACM) Specification
 
-* **Specification Version:** 1.1.0-draft  
+* **Specification Version:** 1.2.0  
 * **Status:** Proposed Standard  
 * **Date:** 2026-08-24  
 * **Authors:** Rob Larsen  
@@ -69,7 +69,7 @@ ACM v1.1 replaces flat booleans with the **Typed Contract Model**. Every core op
 
 | Field | Type | Mandatory | Allowed Values / Schema | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| `acm_version` | String | **REQUIRED** | `"1.1"` | SemVer version of the specification. |
+| `acm_version` | String | **REQUIRED** | `"1.2"` | SemVer version of the specification. |
 | `change_type` | String | **REQUIRED** | `feature`, `refactor`, `bugfix`, `hotfix`, `infra` | Classification of the pull request or code change. |
 | `risk_level` | String | **REQUIRED** | `low`, `medium`, `high`, `critical` | Overall risk assessment based on boundary stability. |
 | `contracts` | Object | **REQUIRED** | Object Map | Core architectural and operational contract declarations. |
@@ -94,11 +94,11 @@ A manifest is structurally invalid if it violates any of the following semantic 
 3. **Condition Obligation:** If any contract status is set to `conditional`, the producer MUST provide a non-empty `conditions` string explaining the required operational prerequisites.
 4. **Ordering Contradiction:** If `contracts.strict_ordering.status` is `guaranteed` or `conditional`, and `distributed_primitives.delivery_semantics` is `at_least_once`, the manifest MUST document partition keys or sequence deduplication in Section 1.
 
-### 4.4 Frontmatter Example (v1.1)
+### 4.4 Frontmatter Example (v1.2)
 
 ```yaml
 ---
-acm_version: "1.1"
+acm_version: "1.2"
 change_type: "feature"
 risk_level: "high"
 contracts:
