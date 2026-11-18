@@ -47,4 +47,18 @@ describe('acm-cli validate process', () => {
     assert.match(result.stderr, /ACM Validation Failed/);
     assert.match(result.stderr, /Frontmatter Schema Error/);
   });
+
+  it('uses fallback file when pr-body has no manifest', () => {
+    const fixture = path.resolve('test/fixtures/valid.acm.md');
+    const result = runCli('--pr-body', 'No manifest here', '--fallback-file', fixture);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /ACM Validation Passed/);
+  });
+
+  it('returns one for duplicate ACM delimiters in pr-body', () => {
+    const fixture = path.resolve('test/fixtures/valid.acm.md');
+    const duplicateDelimiters = '<!-- ACM-START -->\n---\n<!-- ACM-END --><!-- ACM-START -->\n---\n<!-- ACM-END -->';
+    const result = runCli('--pr-body', duplicateDelimiters, '--fallback-file', fixture);
+    assert.equal(result.status, 1);
+  });
 });

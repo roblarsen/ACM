@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACM — Assumptions &amp; Constraints Manifest (v1.2)</title>
+  <meta name="description" content="A formal open-source engineering standard, JSON Schema, and CI linter (acm-cli) for boundary verification, typed runtime contracts, and AI-governed software delivery.">
+  <meta property="og:title" content="Assumptions &amp; Constraints Manifest (ACM v1.2)">
+  <meta property="og:description" content="Stop reverse-engineering AI diffs. Audit the boundary, not just the syntax.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://roblarsen.github.io/ACM/">
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --bg-elevated: #111622;
+      --bg-card: #161d2d;
+      --border: #232d42;
+      --border-strong: #33415c;
+      --text: #e6edf3;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --green: #34d399;
+      --green-bg: rgba(52, 211, 153, 0.12);
+      --amber: #fbbf24;
+      --amber-bg: rgba(251, 191, 36, 0.12);
+      --red: #f87171;
+      --red-bg: rgba(248, 113, 113, 0.12);
+      --purple: #c084fc;
+      --purple-bg: rgba(192, 132, 252, 0.12);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      --radius: 10px;
+      --max-w: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code, pre {
+      font-family: var(--font-mono);
+    }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Header / Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 14, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .brand:hover {
+      text-decoration: none;
+    }
+
+    .badge-spec {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      transition: color 0.15s ease;
+    }
+
+    nav a:hover {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 5.5rem 0 4.5rem;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 65%);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      max-width: 820px;
+      margin-bottom: 1.35rem;
+    }
+
+    .hero-sub {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin-bottom: 2.25rem;
+      line-height: 1.65;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.72rem 1.3rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #06101c;
+    }
+
+    .btn-primary:hover {
+      background: #7dd3fc;
+      text-decoration: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .install-bar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .install-bar span.prompt {
+      color: var(--text-dim);
+      user-select: none;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    /* Sections */
+    section {
+      padding: 4.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      max-width: 720px;
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      font-size: 1.9rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-lead {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    /* Grid Cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.65rem;
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Status Pills */
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 2rem;
+    }
+
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+    }
+
+    .pill-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.25); }
+    .pill-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.25); }
+    .pill-red   { background: var(--red-bg);   color: var(--red);   border: 1px solid rgba(248, 113, 113, 0.25); }
+    .pill-purple{ background: var(--purple-bg);color: var(--purple);border: 1px solid rgba(192, 132, 252, 0.25); }
+    .pill-muted { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* Code Block */
+    .code-window {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      padding: 1.35rem;
+      overflow-x: auto;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+
+    .tok-comment { color: #64748b; }
+    .tok-key     { color: #7dd3fc; }
+    .tok-str     { color: #86efac; }
+    .tok-warn    { color: #fca5a5; }
+    .tok-head    { color: #c084fc; font-weight: 700; }
+
+    /* Comparison Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg-card);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr.highlight-row {
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    tr.highlight-row td:first-child {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Pipeline Diagram */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .step {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .step h4 {
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .step p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    /* Workflows Callout */
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .workflow-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .workflow-card h4 {
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .workflow-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .workflow-card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .workflow-card code {
+      display: block;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      overflow-x: auto;
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem 0;
+      color: var(--text-dim);
+      font-size: 0.88rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 680px) {
+      nav { display: none; }
+      .hero { padding: 3.5rem 0 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <span>ACM</span>
+        <span class="badge-spec">v1.2.0</span>
+      </a>
+      <nav>
+        <a href="#problem">The Problem</a>
+        <a href="#spec">Typed Contracts</a>
+        <a href="#landscape">Landscape</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="https://github.com/roblarsen/ACM" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <span class="eyebrow">Open Engineering Governance Standard &middot; v1.2</span>
+        <h1>Audit the boundary, not just the syntax.</h1>
+        <p class="hero-sub">
+          The <strong>Assumptions &amp; Constraints Manifest (ACM)</strong> is a machine-readable, human-auditable contract format that stops AI-generated code from smuggling silent operational debt into production.
+        </p>
+
+        <div class="cta-row">
+          <a href="https://github.com/roblarsen/ACM/blob/main/spec.md" class="btn btn-primary" target="_blank" rel="noopener">Read Specification</a>
+          <a href="https://github.com/roblarsen/ACM" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+        </div>
+
+        <div class="install-bar">
+          <div><span class="prompt">$ </span><code id="cli-cmd">npx acm-cli validate --pr-body "$PR_BODY" --fallback-file .acm.md</code></div>
+          <button class="copy-btn" onclick="copyCmd()">Copy</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Problem -->
+    <section id="problem">
+      <div class="container">
+        <div class="section-header">
+          <h2>The Happy Path Trap</h2>
+          <p class="section-lead">
+            Generative AI made Day-1 syntax nearly free, creating an asymmetric Day-2 maintenance crisis. LLMs write clean code that passes unit tests while hiding lethal runtime assumptions.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <h3>Silent Architectural Drift</h3>
+            <p>Agents assume process-local in-memory caches run on single instances, omit timeout budgets, and write non-atomic dual-writes without transactional outboxes.</p>
+          </div>
+          <div class="card">
+            <h3>Review Paralysis</h3>
+            <p>Senior engineers spend 80% of PR review energy reverse-engineering what the LLM <em>assumed</em> about concurrency, retries, and failure modes instead of reviewing intent.</p>
+          </div>
+          <div class="card">
+            <h3>Superficial Green Tests</h3>
+            <p>Happy-path test suites pass effortlessly against implicit assumptions—until production traffic spikes, a pod restarts, or a downstream API stalls.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Specification & Example -->
+    <section id="spec">
+      <div class="container">
+        <div class="section-header">
+          <h2>Typed Semantic Contracts &amp; Distributed Primitives</h2>
+          <p class="section-lead">
+            ACM replaces vague checklists with typed contract statuses, mandatory proof obligations, first-class distributed primitives, and CI-enforced risk floors.
+          </p>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill pill-green">guaranteed + evidence</span>
+          <span class="pill pill-purple">conditional + conditions</span>
+          <span class="pill pill-red">unsupported + failure_mode</span>
+          <span class="pill pill-amber">unknown</span>
+          <span class="pill pill-muted">not_applicable</span>
+        </div>
+
+        <div class="code-window">
+          <div class="code-header">
+            <span>PULL_REQUEST_TEMPLATE.md / .acm.md</span>
+            <span>YAML Frontmatter + Auditable Taxonomy</span>
+          </div>
+          <pre><code><span class="tok-comment">&lt;!-- ACM-START --&gt;</span>
+---
+<span class="tok-key">acm_version:</span> <span class="tok-str">"1.1"</span>
+<span class="tok-key">change_type:</span> <span class="tok-str">"feature"</span>
+<span class="tok-key">risk_level:</span> <span class="tok-warn">"critical"</span>
+<span class="tok-key">contracts:</span>
+  <span class="tok-key">idempotency:</span>
+    <span class="tok-key">status:</span> <span class="tok-warn">"unsupported"</span>
+    <span class="tok-key">failure_mode:</span> <span class="tok-str">"Retrying POST re-authorizes payment and duplicates inventory holds."</span>
+  <span class="tok-key">concurrency_safety:</span>
+    <span class="tok-key">status:</span> <span class="tok-warn">"unsupported"</span>
+    <span class="tok-key">failure_mode:</span> <span class="tok-str">"checkStock() and holdStock() interleave under concurrent requests."</span>
+  <span class="tok-key">horizontal_scalability:</span>
+    <span class="tok-key">status:</span> <span class="tok-str">"guaranteed"</span>
+    <span class="tok-key">evidence:</span> <span class="tok-str">"src/checkout.ts:14-48 — stateless handler; state lives in Postgres &amp; Stripe."</span>
+  <span class="tok-key">strict_ordering:</span>
+    <span class="tok-key">status:</span> <span class="tok-str">"not_applicable"</span>
+  <span class="tok-key">data_loss_safety:</span>
+    <span class="tok-key">status:</span> <span class="tok-warn">"unsupported"</span>
+    <span class="tok-key">failure_mode:</span> <span class="tok-str">"Dual-write vulnerability: Stripe charge succeeds before DB commit without Outbox."</span>
+<span class="tok-key">distributed_primitives:</span>
+  <span class="tok-key">consistency_model:</span> <span class="tok-str">"eventual"</span>
+  <span class="tok-key">delivery_semantics:</span> <span class="tok-str">"at_least_once"</span>
+  <span class="tok-key">degradation_mode:</span> <span class="tok-str">"fail_closed"</span>
+  <span class="tok-key">backpressure_strategy:</span> <span class="tok-str">"fail_fast"</span>
+---
+
+<span class="tok-head">### 1. Invariants &amp; Data Model Boundaries</span>
+* **Payload Validation:** Assumes non-empty items array; amountCents &gt; 50.
+
+<span class="tok-head">### 2. State &amp; Runtime Topology</span>
+* **Concurrency &amp; Locking:** No distributed Redlock or row-level locks across inventory loop.
+
+<span class="tok-head">### 3. Environmental &amp; Network Assumptions</span>
+* **Cross-Boundary Atomicity:** Missing Saga rollback if item #2 fails after item #1 is held.
+
+<span class="tok-head">### 4. Explicit Non-Goals &amp; Unhandled Failure Modes</span>
+* **Degradation:** Stripe timeouts bubble as unhandled HTTP 500 without releasing stock holds.
+<span class="tok-comment">&lt;!-- ACM-END --&gt;</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Governance Landscape -->
+    <section id="landscape">
+      <div class="container">
+        <div class="section-header">
+          <h2>Where ACM Fits</h2>
+          <p class="section-lead">
+            ACM complements existing engineering formalisms by closing the operational gap at the Pull Request change horizon.
+          </p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Formalism</th>
+                <th>Scope &amp; Granularity</th>
+                <th>Lifecycle Phase</th>
+                <th>Core Question Answered</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Architecture Decision Records (ADR)</strong></td>
+                <td>Macro / System-wide</td>
+                <td>Design &amp; Inception</td>
+                <td>"Why did we choose Kafka over RabbitMQ two years ago?"</td>
+              </tr>
+              <tr>
+                <td><strong>OpenAPI / Protobuf / JSON Schema</strong></td>
+                <td>System Boundary (I/O)</td>
+                <td>API Design &amp; Integration</td>
+                <td>"What shape and data types does this endpoint accept?"</td>
+              </tr>
+              <tr>
+                <td><strong>Design by Contract (DbC)</strong></td>
+                <td>Code Unit (Class / Function)</td>
+                <td>Runtime Execution</td>
+                <td>"What pre/post conditions must hold inside this method?"</td>
+              </tr>
+              <tr class="highlight-row">
+                <td>Assumptions &amp; Constraints Manifest (ACM)</td>
+                <td>Change Horizon (PR Diff)</td>
+                <td>Code Review &amp; CI Gate</td>
+                <td>"What silent runtime boundaries is this diff assuming right now?"</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Start & v1.2 Workflows -->
+    <section id="quickstart">
+      <div class="container">
+        <div class="section-header">
+          <h2>Adopt in 4 Steps</h2>
+          <p class="section-lead">
+            Drop-in assets for Cursor, GitHub Copilot, Pull Request templates, and GitHub Actions—now supporting both inline PR blocks and durable <code>.acm.md</code> fallback artifacts in v1.2.
+          </p>
+        </div>
+
+        <div class="pipeline">
+          <div class="step">
+            <span class="step-num">01 / AGENT RULES</span>
+            <h4>Configure IDE Prompts</h4>
+            <p>Add <code>templates/CURSORRULES.md</code> to <code>.cursorrules</code> or <code>.github/copilot-instructions.md</code> to require evidence-backed ACM blocks.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">02 / PR TEMPLATE</span>
+            <h4>Embed PR Contract</h4>
+            <p>Copy <code>templates/PULL_REQUEST_TEMPLATE.md</code> into <code>.github/</code> so agents populate boundaries while humans keep a low-friction path.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">03 / CI LINTER</span>
+            <h4>Gate with acm-cli v1.2</h4>
+            <p>Run <code>npx acm-cli validate</code> in GitHub Actions to enforce JSON Schema Draft 2020-12 compliance, proof obligations, and risk floors.</p>
+          </div>
+          <div class="step">
+            <span class="step-num">04 / REVIEW GATE</span>
+            <h4>Audit Boundaries First</h4>
+            <p>Reviewers scan Section 2 &amp; 4 in 30 seconds to catch horizontal scaling or data-loss mismatches before reading business logic.</p>
+          </div>
+        </div>
+
+        <div class="workflow-grid">
+          <div class="workflow-card">
+            <h4>
+              <span>Inline PR Block</span>
+              <span class="workflow-tag">Single-Pass Synthesis</span>
+            </h4>
+            <p>Embed <code>&lt;!-- ACM-START --&gt;</code> directly inside the Pull Request description. Ideal when synthesizing a unified manifest from <code>git diff main...HEAD</code>.</p>
+            <code>npx acm-cli validate --pr-body "$PR_BODY"</code>
+          </div>
+          <div class="workflow-card">
+            <h4>
+              <span>Durable Workspace Artifact</span>
+              <span class="workflow-tag">New in v1.2</span>
+            </h4>
+            <p>Commit a tracked <code>.acm.md</code> file across multi-step branches and Codespace reboots. CI automatically falls back to <code>.acm.md</code> when the PR body has no block.</p>
+            <code>npx acm-cli validate --pr-body "$PR_BODY" --fallback-file .acm.md</code>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>Assumptions &amp; Constraints Manifest (ACM) &middot; MIT License &middot; Created by <a href="https://github.com/roblarsen" target="_blank" rel="noopener">Rob Larsen</a></div>
+      <div class="footer-links">
+        <a href="https://github.com/roblarsen/ACM/blob/main/spec.md" target="_blank" rel="noopener">Specification</a>
+        <a href="https://github.com/roblarsen/ACM/blob/main/schemas/acm.schema.json" target="_blank" rel="noopener">JSON Schema</a>
+        <a href="https://www.npmjs.com/package/acm-cli" target="_blank" rel="noopener">npm (acm-cli v1.2)</a>
+        <a href="https://github.com/roblarsen/ACM/tree/main/examples" target="_blank" rel="noopener">Examples</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function copyCmd() {
+      const cmd = document.getElementById('cli-cmd').innerText;
+      navigator.clipboard.writeText(cmd).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.innerText = 'Copied!';
+        setTimeout(() => { btn.innerText = 'Copy'; }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>
