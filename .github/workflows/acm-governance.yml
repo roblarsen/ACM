@@ -64,9 +64,9 @@ jobs:
             <details ${isValid ? '' : 'open'}>
             <summary><b>View Auditor Log Output</b></summary>
 
-            \\`\\`\\`text
+            \`\`\`text
             ${rawLog.trim()}
-            \\`\\`\\`
+            \`\`\`
             </details>
 
             ---
