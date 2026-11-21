@@ -1,6 +1,6 @@
 # acm-cli
 
-> Command-line linter and governance parser for the **Assumptions & Constraints Manifest (ACM v1.1)** specification.
+> Command-line linter and governance parser for the **Assumptions & Constraints Manifest (ACM v1.2)** specification.
 
 ## Installation
 

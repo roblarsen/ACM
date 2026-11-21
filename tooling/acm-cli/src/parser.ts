@@ -124,7 +124,7 @@ function validateSemanticCoherence(fm: ACMFrontmatter, errors: string[], warning
 }
 
 /**
- * Parses and validates an ACM string against SPEC v1.1.0-draft.
+ * Parses and validates an ACM string against SPEC v1.2.0.
  */
 export function parseAndValidateACM(rawAcmText: string): ACMValidationResult {
   const errors: string[] = [];

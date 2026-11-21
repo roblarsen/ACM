@@ -2,7 +2,7 @@
 
 **Authors:** Rob Larsen  
 **Target Audience:** Principal Architects, VP/Directors of Engineering, Tooling Authors  
-**Specification Reference:** [ACM Specification v1.1.0-draft](https://github.com/roblarsen/ACM/blob/main/spec.md)
+**Specification Reference:** [ACM Specification v1.2.0](https://github.com/roblarsen/ACM/blob/main/spec.md)
 
 ---
 
@@ -95,7 +95,7 @@ An ACM document bridges machine-readable governance (YAML frontmatter) with audi
 ```markdown
 <!-- ACM-START -->
 ---
-acm_version: "1.1"
+acm_version: "1.2"
 change_type: "feature"
 risk_level: "critical"
 contracts:
